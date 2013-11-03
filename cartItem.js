@@ -1,5 +1,5 @@
 module.exports = {
-	CartItem : function(name, buyItNow, price, img, condition ,hasBid, qtyToPurchase){
+	CartItem : function(name, buyItNow, price, img, condition ,hasBid, qtyToPurchase, shippingPrice){
 	this.id = "";
 	this.name = name;
 	this.buyItNow = buyItNow;	
@@ -8,6 +8,7 @@ module.exports = {
 	this.condition = condition;	
 	this.hasBid = hasBid;
 	this.qtyToPurchase = qtyToPurchase;
+	this.shippingPrice = shippingPrice;
 	//Add quantity of items available to compare with qty to buy
 	}
 };

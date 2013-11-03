@@ -367,7 +367,7 @@ app.put('/BigBoxServer/cart/:id', function(req, res) {
 	var id = req.params.id;
 	console.log("PUT");
 	console.log(req.body);
-	var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1);
+	var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1, req.body.shippingPrice);
 	console.log("PUT after creating object");
 	itemToAdd.id = id;
 	console.log("PUT:" + itemToAdd);
