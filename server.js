@@ -343,12 +343,14 @@ app.post('/BigBoxServer/user', function(req, res) {
 	user = findByUsername(req.body.username);
 	// store the username as a session variable
 
-	if (user.id != -1 && req.body.password == user.password) {
-		req.session.username = user.username;
+	if (req.body.username == user.username && req.body.password == user.password) {
+		req.session.username = req.body.username;
 		cookie.push(req.session);
 		res.send(200);
-	} else
+	} else{
+	
 		res.send(401, "Incorect username or password.");
+	}
 });
 
 app.post('/BigBoxServer/register', function(req, res) {
