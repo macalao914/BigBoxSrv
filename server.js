@@ -98,6 +98,8 @@ var Address = address.Address;
 var creditcard = require("./creditcard.js");
 var CreditCard = creditcard.CreditCard;
 
+var cartItem = require("./cartItem.js");
+var CartItem = cartItem.CartItem;
 /*  Variables to store the data in the server  */
 
 //defines the item list
@@ -110,6 +112,7 @@ for (var i = 0; i < itemList.length; ++i) {
 
 //defines the items in the cart
 var cartList = new Array();
+var cartItemNextId = 0;
 
 //defines the addresses saved by a user
 var addressList = new Array();
@@ -118,6 +121,8 @@ var addressNextId = 0;
 //defines the list of credit cards that a user has saved
 var creditcardList = new Array();
 var creditcardNextId = 0;
+
+
 
 /*====================================================================================================================================
  REST Operations
@@ -294,16 +299,6 @@ app.get('/BigBoxServer/account', function(req, res) {
 /*====================================================================================================================================
 REST Opertaion : HTTP POST
 ====================================================================================================================================*/
-//Add an item to the cart
-app.post('/BigBoxServer/cart', function(req, res) {
-	console.log("POST");
-	var itemToAdd = new Item(req.body.name, req.body.model, req.body.year, req.body.info, req.body.buyItNow, req.body.price, req.body.img, req.body.width, req.body.length, req.body.heigth, req.body.weigth, req.body.shipTo, req.body.shipFrom, req.body.condition, req.body.hasBid, req.body.bid, req.body.seller, req.body.shippingPrice);
-	itemToAdd.id = req.body.id;
-	console.log("Item to add: " + JSON.stringify(itemToAdd));
-	cartList.push(itemToAdd);
-	console.log("Item added. Length: " + cartList.length);
-	res.json(true);
-});
 
 //Add a new address to the saved addresses
 app.post('/BigBoxServer/addresses', function(req, res) {
@@ -367,6 +362,40 @@ app.post('/BigBoxServer/register', function(req, res) {
 /*====================================================================================================================================
  REST Opertaion : HTTP PUT
  ====================================================================================================================================*/
+//Add an item to the cart
+app.put('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+	console.log("PUT");
+	console.log(req.body);
+	var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1);
+	console.log("PUT after creating object");
+	itemToAdd.id = id;
+	console.log("PUT:" + itemToAdd);
+	var target = -1;
+	for (var i = 0; i < cartList.length; ++i) {
+			if (cartList[i].id == id) {
+				target = i;
+				break;
+			}
+		}
+	console.log("Item to add: " + JSON.stringify(itemToAdd));
+	if (target == -1) {
+			cartList.push(itemToAdd);
+			res.json(true);
+	} else {
+			var theitem = cartList[target];
+			theitem.qtyToPurchase++;
+			var response = {
+				"Item" : theitem
+			};
+			res.json(response);
+			
+	}
+	
+	
+});
+
+
 app.put('/BigBoxServer/items/:id', function(req, res) {
 	var id = req.params.id;
 
