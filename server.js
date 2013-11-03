@@ -420,6 +420,35 @@ app.put('/BigBoxServer/items/:id', function(req, res) {
 /*====================================================================================================================================
  REST Opertaion : HTTP DELETE
  ====================================================================================================================================*/
+//Remove item from cart
+app.del('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+		console.log("DELETE item: " + id);
+
+	if ((id < 0) || (id >= itemNextId)){
+		// not found
+		res.statusCode = 404;
+		res.send("Item not found.");
+	}
+	else {
+		var target = -1;
+		for (var i=0; i < cartList.length; ++i){
+			if (cartList[i].id == id){
+				target = i;
+				break;	
+			}
+		}
+		if (target == -1){
+			res.statusCode = 404;
+			res.send("Car not found.");			
+		}	
+		else {
+			cartList.splice(target, 1);
+  			res.json(true);
+  		}		
+	}
+});
+
 
 /*====================================================================================================================================
  Support Functions
