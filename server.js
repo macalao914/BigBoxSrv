@@ -103,14 +103,9 @@ var Address = address.Address;
 var creditcard = require("./creditcard.js");
 var CreditCard = creditcard.CreditCard;
 
-
-
-<<<<<<< HEAD
-=======
 var cartItem = require("./cartItem.js");
 var CartItem = cartItem.CartItem;
 /*  Variables to store the data in the server  */
->>>>>>> 98af899af49664d81f8ef9c7e9e4f400c6dbecc1
 
 //defines the item list
 var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
