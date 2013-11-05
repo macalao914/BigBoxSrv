@@ -112,7 +112,7 @@ var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Kn
 
 //defines the category list
 
-var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Leo"));
+var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Music"));
 categoriesList[0].setSubCategory("Action").setSubCategory("Drama");
 categoriesList[0].getSubCategory(0).setSubCategory("Adventure").setSubCategory("RPG");
 
