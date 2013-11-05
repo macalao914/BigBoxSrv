@@ -46,9 +46,9 @@ var users = [{
 	country : 'US',
 	zipcode : '00980',
 	phone : '7875555555',
-	username : 'legendario',
+	username : '',
 	email : 'frankie@somewhere.who',
-	password : 'qwe',
+	password : '',
 	question : 'question',
 	answer : 'answer',
 	bids : ['item1', 'item2', 'item3', 'item4'],
@@ -89,6 +89,10 @@ var users = [{
 }];
 
 var cookie = new Array();
+
+var category = require("./category.js");
+var Category = category.Category;
+
 var item = require("./item.js");
 var Item = item.Item;
 
@@ -98,10 +102,14 @@ var Address = address.Address;
 var creditcard = require("./creditcard.js");
 var CreditCard = creditcard.CreditCard;
 
-/*  Variables to store the data in the server  */
+
+
 
 //defines the item list
 var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
+
+//defines the category list
+var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Leo"));
 
 var itemNextId = 0;
 for (var i = 0; i < itemList.length; ++i) {
@@ -134,6 +142,15 @@ var creditcardNextId = 0;
 /*====================================================================================================================================
  REST Opertaion : HTTP GET
  ====================================================================================================================================*/
+app.get('/BigBoxServer/categories', function(req, res) {
+	console.log("GET-categories");
+	var response = {
+		"categories" : categoriesList
+	};
+	console.log("reponse:"+JSON.stringify(response));
+	res.json(response);
+});
+
 app.get('/BigBoxServer/items', function(req, res) {
 	console.log("GET-itemS");
 	var response = {
