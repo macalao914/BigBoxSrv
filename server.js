@@ -13,7 +13,6 @@ var allowCrossDomain = function(req, res, next) {
 		next();
 	}
 };
-
 app.configure(function() {
 	app.use(allowCrossDomain);
 	app.set('port', process.env.PORT || 3412);
@@ -92,7 +91,6 @@ var users = [{
 var cookie = new Array();
 
 var Category = require("./category.js");
-//var Category = category.Category;
 
 var item = require("./item.js");
 var Item = item.Item;
@@ -103,20 +101,17 @@ var Address = address.Address;
 var creditcard = require("./creditcard.js");
 var CreditCard = creditcard.CreditCard;
 
+
 var cartItem = require("./cartItem.js");
 var CartItem = cartItem.CartItem;
 /*  Variables to store the data in the server  */
+
 
 //defines the item list
 var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
 
 //defines the category list
-
-var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Music"));
-categoriesList[0].setSubCategory("Action").setSubCategory("Drama");
-categoriesList[0].getSubCategory(0).setSubCategory("Adventure").setSubCategory("RPG");
-
-console.log(JSON.stringify(categoriesList[0]));
+var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Leo"));
 
 var itemNextId = 0;
 for (var i = 0; i < itemList.length; ++i) {
@@ -125,6 +120,7 @@ for (var i = 0; i < itemList.length; ++i) {
 
 //defines the items in the cart
 var cartList = new Array();
+var cartItemNextId = 0;
 
 //defines the addresses saved by a user
 var addressList = new Array();
@@ -133,6 +129,8 @@ var addressNextId = 0;
 //defines the list of credit cards that a user has saved
 var creditcardList = new Array();
 var creditcardNextId = 0;
+
+
 
 /*====================================================================================================================================
  REST Operations
@@ -318,16 +316,6 @@ app.get('/BigBoxServer/account', function(req, res) {
 /*====================================================================================================================================
 REST Opertaion : HTTP POST
 ====================================================================================================================================*/
-//Add an item to the cart
-app.post('/BigBoxServer/cart', function(req, res) {
-	console.log("POST");
-	var itemToAdd = new Item(req.body.name, req.body.model, req.body.year, req.body.info, req.body.buyItNow, req.body.price, req.body.img, req.body.width, req.body.length, req.body.heigth, req.body.weigth, req.body.shipTo, req.body.shipFrom, req.body.condition, req.body.hasBid, req.body.bid, req.body.seller, req.body.shippingPrice);
-	itemToAdd.id = req.body.id;
-	console.log("Item to add: " + JSON.stringify(itemToAdd));
-	cartList.push(itemToAdd);
-	console.log("Item added. Length: " + cartList.length);
-	res.json(true);
-});
 
 //Add a new address to the saved addresses
 app.post('/BigBoxServer/addresses', function(req, res) {
@@ -393,6 +381,40 @@ app.post('/BigBoxServer/register', function(req, res) {
 /*====================================================================================================================================
  REST Opertaion : HTTP PUT
  ====================================================================================================================================*/
+//Add an item to the cart
+app.put('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+	console.log("PUT");
+	console.log(req.body);
+	var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1, req.body.shippingPrice);
+	console.log("PUT after creating object");
+	itemToAdd.id = id;
+	console.log("PUT:" + itemToAdd);
+	var target = -1;
+	for (var i = 0; i < cartList.length; ++i) {
+			if (cartList[i].id == id) {
+				target = i;
+				break;
+			}
+		}
+	console.log("Item to add: " + JSON.stringify(itemToAdd));
+	if (target == -1) {
+			cartList.push(itemToAdd);
+			res.json(true);
+	} else {
+			var theitem = cartList[target];
+			theitem.qtyToPurchase++;
+			var response = {
+				"Item" : theitem
+			};
+			res.json(response);
+			
+	}
+	
+	
+});
+
+
 app.put('/BigBoxServer/items/:id', function(req, res) {
 	var id = req.params.id;
 
@@ -446,6 +468,35 @@ app.put('/BigBoxServer/items/:id', function(req, res) {
 /*====================================================================================================================================
  REST Opertaion : HTTP DELETE
  ====================================================================================================================================*/
+//Remove item from cart
+app.del('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+		console.log("DELETE item: " + id);
+
+	if ((id < 0) || (id >= itemNextId)){
+		// not found
+		res.statusCode = 404;
+		res.send("Item not found.");
+	}
+	else {
+		var target = -1;
+		for (var i=0; i < cartList.length; ++i){
+			if (cartList[i].id == id){
+				target = i;
+				break;	
+			}
+		}
+		if (target == -1){
+			res.statusCode = 404;
+			res.send("Car not found.");			
+		}	
+		else {
+			cartList.splice(target, 1);
+  			res.json(true);
+  		}		
+	}
+});
+
 
 /*====================================================================================================================================
  Support Functions
