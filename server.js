@@ -111,7 +111,22 @@ var CartItem = cartItem.CartItem;
 var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
 
 //defines the category list
-var categoriesList = new Array(new Category("Movies"), new Category("Home"), new Category("Leo"));
+var categoriesList = new Array(new Category("root").setSubCategory("Movies").setSubCategory("Home").setSubCategory("Instrument").setSubCategory("Games"));
+categoriesList[0].getSubCategory(0).setSubCategory("Drama").setSubCategory("Action").setSubCategory("Thriller");
+categoriesList[0].getSubCategory(1).setSubCategory("Door").setSubCategory("Carpet").setSubCategory("Window").setSubCategory("Room");
+categoriesList[0].getSubCategory(2).setSubCategory("Guitar").setSubCategory("Piano").setSubCategory("Drums");
+categoriesList[0].getSubCategory(3).setSubCategory("Adventure").setSubCategory("Action");
+
+
+var categoryNextId = 0;
+categoriesList[0].cid = 0;// Set id 0 to root
+for (var i = 0; i < categoriesList[0].numbSub; i++) {
+	categoriesList[0].getSubCategory(i).cid = i;
+	for(var j = 0; j < categoriesList[0].getSubCategory(i).numbSub; j++){
+		categoriesList[0].getSubCategory(i).getSubCategory(j).cid = j;	
+	}
+}
+console.log(categoriesList[0].showCurrentCategory());
 
 var itemNextId = 0;
 for (var i = 0; i < itemList.length; ++i) {
@@ -149,6 +164,7 @@ var creditcardNextId = 0;
  ====================================================================================================================================*/
 app.get('/BigBoxServer/categories', function(req, res) {
 	console.log("GET-categories");
+	
 	var response = {
 		"categories" : categoriesList
 	};
