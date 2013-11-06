@@ -111,11 +111,20 @@ var CartItem = cartItem.CartItem;
 var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
 
 //defines the category list
+//Adding root and first level
 var categoriesList = new Array(new Category("root").setSubCategory("Movies").setSubCategory("Home").setSubCategory("Instrument").setSubCategory("Games"));
+
+//Adding second level
 categoriesList[0].getSubCategory(0).setSubCategory("Drama").setSubCategory("Action").setSubCategory("Thriller");
 categoriesList[0].getSubCategory(1).setSubCategory("Door").setSubCategory("Carpet").setSubCategory("Window").setSubCategory("Room");
 categoriesList[0].getSubCategory(2).setSubCategory("Guitar").setSubCategory("Piano").setSubCategory("Drums");
 categoriesList[0].getSubCategory(3).setSubCategory("Adventure").setSubCategory("Action");
+
+//Adding third level
+categoriesList[0].getSubCategory(0).getSubCategory(0).setSubCategory("Sad").setSubCategory("Lovely").setSubCategory("Laugh");
+categoriesList[0].getSubCategory(0).getSubCategory(1).setSubCategory("Gun").setSubCategory("Karate").setSubCategory("Chinese").setSubCategory("Blood");
+categoriesList[0].getSubCategory(0).getSubCategory(2).setSubCategory("Horror").setSubCategory("Zombies");
+
 
 
 var categoryNextId = 0;
