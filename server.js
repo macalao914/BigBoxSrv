@@ -340,6 +340,7 @@ app.post('/BigBoxServer/creditcards', function(req, res) {
 //Login
 app.post('/BigBoxServer/user', function(req, res) {
 	// if the username is not submitted, give it a default of "Anonymous"
+	
 	user = findByUsername(req.body.username);
 	// store the username as a session variable
 
