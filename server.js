@@ -219,12 +219,12 @@ client.connect(function(err) {
 
 	app.get('/BigBoxServer/subcategories/:id', function(req, res) {
 		var id = req.params.id;
-		console.log("id send:"+id);
-		client.query("SELECT * from category natural join subcategory where cid = "+ id, function(err, result) {
+		console.log("id send:" + id);
+		client.query("SELECT * from category natural join subcategory where cid = " + id, function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
-			console.log(" "+result.rows.scname);
+			console.log(" " + result.rows.scname);
 			var id = req.params.id;
 			console.log("GET item: " + id);
 
@@ -235,15 +235,15 @@ client.connect(function(err) {
 
 		});
 	});
-	
+
 	app.get('/BigBoxServer/2subcategories/:id', function(req, res) {
 		var id = req.params.id;
-		console.log("subid send:"+id);
-		client.query("SELECT * from category natural join subcategory natural join secondsubcategory where subid = "+ id, function(err, result) {
+		console.log("subid send:" + id);
+		client.query("SELECT * from category natural join subcategory natural join secondsubcategory where subid = " + id, function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
-			console.log(" "+result.rows[0].sscname);
+			console.log(" " + result.rows[0].sscname);
 			var id = req.params.id;
 			console.log("GET item: " + id);
 
@@ -254,8 +254,6 @@ client.connect(function(err) {
 
 		});
 	});
-	
-	
 
 	/**
 	 client.connect(function(err) {
@@ -509,7 +507,6 @@ client.connect(function(err) {
 		res.json(true);
 	});
 
-<<<<<<< HEAD
 	var newCreditCard = new CreditCard(req.body.cardnumber, req.body.exp_month, req.body.exp_year, req.body.holder_name);
 	console.log("New Address: " + JSON.stringify(newCreditCard));
 	newCreditCard.id = creditcardNextId++;
@@ -520,7 +517,7 @@ client.connect(function(err) {
 //Login
 app.post('/BigBoxServer/user', function(req, res) {
 	// if the username is not submitted, give it a default of "Anonymous"
-	
+
 	user = findByUsername(req.body.username);
 	// store the username as a session variable
 
@@ -528,54 +525,139 @@ app.post('/BigBoxServer/user', function(req, res) {
 		req.session.username = req.body.username;
 		cookie.push(req.session);
 		res.send(200);
-	} else{
-	
+	} else {
+
 		res.send(401, "Incorect username or password.");
 	}
 });
-=======
-	//Login
-	app.post('/BigBoxServer/user', function(req, res) {
-		// if the username is not submitted, give it a default of "Anonymous"
-		user = findByUsername(req.body.username);
-		// store the username as a session variable
->>>>>>> 77b06dce787292050c6544922e70385e361d81de
 
-		if (req.body.username == user.username && req.body.password == user.password) {
-			req.session.username = req.body.username;
-			cookie.push(req.session);
-			res.send(200);
-		} else {
+//Login
+app.post('/BigBoxServer/user', function(req, res) {
+	// if the username is not submitted, give it a default of "Anonymous"
+	user = findByUsername(req.body.username);
+	// store the username as a session variable
 
-			res.send(401, "Incorect username or password.");
+	if (req.body.username == user.username && req.body.password == user.password) {
+		req.session.username = req.body.username;
+		cookie.push(req.session);
+		res.send(200);
+	} else {
+
+		res.send(401, "Incorect username or password.");
+	}
+});
+
+app.post('/BigBoxServer/register', function(req, res) {
+	var temp = new Array(req.body.fname, req.body.lname, req.body.address, req.body.city, req.body.state, req.body.country, req.body.zipcode, req.body.phone, req.body.new_username, req.body.email, req.body.new_password, req.body.question, req.body.answer);
+	console.log(temp.length);
+	var val = isValid(temp, req.body.renter);
+	if (val != "valid") {
+		res.send(400, val);
+	} else {
+
+		adduser(temp);
+		res.send(200);
+	}
+
+});
+/*====================================================================================================================================
+REST Opertaion : HTTP PUT
+====================================================================================================================================*/
+//Add an item to the cart
+app.put('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+	console.log("PUT");
+	console.log(req.body);
+	var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1, req.body.shippingPrice);
+	console.log("PUT after creating object");
+	itemToAdd.id = id;
+	console.log("PUT:" + itemToAdd);
+	var target = -1;
+	for (var i = 0; i < cartList.length; ++i) {
+		if (cartList[i].id == id) {
+			target = i;
+			break;
 		}
-	});
+	}
+	console.log("Item to add: " + JSON.stringify(itemToAdd));
+	if (target == -1) {
+		cartList.push(itemToAdd);
+		res.json(true);
+	} else {
+		var theitem = cartList[target];
+		theitem.qtyToPurchase++;
+		var response = {
+			"Item" : theitem
+		};
+		res.json(response);
 
-	app.post('/BigBoxServer/register', function(req, res) {
-		var temp = new Array(req.body.fname, req.body.lname, req.body.address, req.body.city, req.body.state, req.body.country, req.body.zipcode, req.body.phone, req.body.new_username, req.body.email, req.body.new_password, req.body.question, req.body.answer);
-		console.log(temp.length);
-		var val = isValid(temp, req.body.renter);
-		if (val != "valid") {
-			res.send(400, val);
-		} else {
+	}
 
-			adduser(temp);
-			res.send(200);
+});
+
+app.put('/BigBoxServer/items/:id', function(req, res) {
+	var id = req.params.id;
+
+	console.log("PUT item: " + id);
+	console.log(req.body);
+	if ((id < 0) || (id >= itemNextId)) {
+		// not found
+		res.statusCode = 404;
+		res.send("Item not found.");
+	} else if (!req.body.hasOwnProperty('img') || !req.body.hasOwnProperty('info') || !req.body.hasOwnProperty('price')) {
+		res.statusCode = 400;
+		return res.send('Error: Missing fields for the item.');
+	} else {
+		var target = -1;
+		for (var i = 0; i < itemList.length; ++i) {
+			if (itemList[i].id == id) {
+				target = i;
+				break;
+			}
 		}
+		if (target == -1) {
+			res.statusCode = 404;
+			res.send("Item not found.");
+		} else {
+			var theitem = itemList[target];
+			theitem.bid = req.body.bid;
+			theitem.name = req.body.name;
+			theitem.model = req.body.model;
+			theitem.year = req.body.year;
+			theitem.info = req.body.info;
+			theitem.buyItNow = req.body.buyItNow;
+			theitem.price = req.body.price;
+			theitem.img = req.body.img;
+			theitem.dimension = " " + req.body.width + "x" + req.body.length + "x" + req.body.heigth;
+			theitem.weigth = req.body.weigth;
+			theitem.shipTo = req.body.shipTo;
+			theitem.shipFrom = req.body.shipFrom;
+			theitem.condition = req.body.condition;
+			theitem.hasBid = req.body.hasBid;
+			theitem.bid = req.body.bid;
+			theitem.seller = req.body.seller;
+			theitem.shippingPrice = req.body.shippingPrice;
+			var response = {
+				"item" : theitem
+			};
+			res.json(response);
+		}
+	}
+});
 
-	});
-	/*====================================================================================================================================
-	REST Opertaion : HTTP PUT
-	====================================================================================================================================*/
-	//Add an item to the cart
-	app.put('/BigBoxServer/cart/:id', function(req, res) {
-		var id = req.params.id;
-		console.log("PUT");
-		console.log(req.body);
-		var itemToAdd = new CartItem(req.body.name, req.body.buyItNow, req.body.price, req.body.img, req.body.condition, req.body.hasBid, 1, req.body.shippingPrice);
-		console.log("PUT after creating object");
-		itemToAdd.id = id;
-		console.log("PUT:" + itemToAdd);
+/*====================================================================================================================================
+REST Opertaion : HTTP DELETE
+====================================================================================================================================*/
+//Remove item from cart
+app.del('/BigBoxServer/cart/:id', function(req, res) {
+	var id = req.params.id;
+	console.log("DELETE item: " + id);
+
+	if ((id < 0) || (id >= itemNextId)) {
+		// not found
+		res.statusCode = 404;
+		res.send("Item not found.");
+	} else {
 		var target = -1;
 		for (var i = 0; i < cartList.length; ++i) {
 			if (cartList[i].id == id) {
@@ -583,174 +665,87 @@ app.post('/BigBoxServer/user', function(req, res) {
 				break;
 			}
 		}
-		console.log("Item to add: " + JSON.stringify(itemToAdd));
 		if (target == -1) {
-			cartList.push(itemToAdd);
+			res.statusCode = 404;
+			res.send("Car not found.");
+		} else {
+			cartList.splice(target, 1);
 			res.json(true);
-		} else {
-			var theitem = cartList[target];
-			theitem.qtyToPurchase++;
-			var response = {
-				"Item" : theitem
-			};
-			res.json(response);
-
 		}
-
-	});
-
-	app.put('/BigBoxServer/items/:id', function(req, res) {
-		var id = req.params.id;
-
-		console.log("PUT item: " + id);
-		console.log(req.body);
-		if ((id < 0) || (id >= itemNextId)) {
-			// not found
-			res.statusCode = 404;
-			res.send("Item not found.");
-		} else if (!req.body.hasOwnProperty('img') || !req.body.hasOwnProperty('info') || !req.body.hasOwnProperty('price')) {
-			res.statusCode = 400;
-			return res.send('Error: Missing fields for the item.');
-		} else {
-			var target = -1;
-			for (var i = 0; i < itemList.length; ++i) {
-				if (itemList[i].id == id) {
-					target = i;
-					break;
-				}
-			}
-			if (target == -1) {
-				res.statusCode = 404;
-				res.send("Item not found.");
-			} else {
-				var theitem = itemList[target];
-				theitem.bid = req.body.bid;
-				theitem.name = req.body.name;
-				theitem.model = req.body.model;
-				theitem.year = req.body.year;
-				theitem.info = req.body.info;
-				theitem.buyItNow = req.body.buyItNow;
-				theitem.price = req.body.price;
-				theitem.img = req.body.img;
-				theitem.dimension = " " + req.body.width + "x" + req.body.length + "x" + req.body.heigth;
-				theitem.weigth = req.body.weigth;
-				theitem.shipTo = req.body.shipTo;
-				theitem.shipFrom = req.body.shipFrom;
-				theitem.condition = req.body.condition;
-				theitem.hasBid = req.body.hasBid;
-				theitem.bid = req.body.bid;
-				theitem.seller = req.body.seller;
-				theitem.shippingPrice = req.body.shippingPrice;
-				var response = {
-					"item" : theitem
-				};
-				res.json(response);
-			}
-		}
-	});
-
-	/*====================================================================================================================================
-	REST Opertaion : HTTP DELETE
-	====================================================================================================================================*/
-	//Remove item from cart
-	app.del('/BigBoxServer/cart/:id', function(req, res) {
-		var id = req.params.id;
-		console.log("DELETE item: " + id);
-
-		if ((id < 0) || (id >= itemNextId)) {
-			// not found
-			res.statusCode = 404;
-			res.send("Item not found.");
-		} else {
-			var target = -1;
-			for (var i = 0; i < cartList.length; ++i) {
-				if (cartList[i].id == id) {
-					target = i;
-					break;
-				}
-			}
-			if (target == -1) {
-				res.statusCode = 404;
-				res.send("Car not found.");
-			} else {
-				cartList.splice(target, 1);
-				res.json(true);
-			}
-		}
-	});
-
-	/*====================================================================================================================================
-	 Support Functions
-	 ====================================================================================================================================*/
-
-	function findByUsername(username) {
-		for (var i = 0, len = users.length; i < len; i++) {
-			var user = users[i];
-			if (user.username === username) {
-				return user;
-			}
-		}
-		return users[0];
 	}
+});
 
-	function isLoggedIn(user) {
-		if (user == undefined)
-			return false;
-		else
-			return true;
+/*====================================================================================================================================
+ Support Functions
+ ====================================================================================================================================*/
 
+function findByUsername(username) {
+	for (var i = 0, len = users.length; i < len; i++) {
+		var user = users[i];
+		if (user.username === username) {
+			return user;
+		}
+	}
+	return users[0];
+}
+
+function isLoggedIn(user) {
+	if (user == undefined)
+		return false;
+	else
+		return true;
+
+};
+
+function adduser(arr) {
+
+	users = users.concat({
+		id : users.length,
+		fname : arr[0],
+		lname : arr[1],
+		address : arr[2],
+		city : arr[3],
+		state : arr[4],
+		country : arr[5],
+		zipcode : arr[6],
+		phone : arr[7],
+		username : arr[8],
+		email : arr[9],
+		password : arr[10],
+		question : arr[11],
+		answer : arr[12]
+	});
+
+	return users[users.length - 1];
+};
+
+function isValid(arr, renter) {
+
+	for (var i = 0; i < arr.length; i++) {
+		console.log(i);
+		console.log(arr);
+		if (arr[i].length == 0)
+			return "Form is not complete.";
+	};
+	console.log("validating");
+
+	if (arr[10] != renter)
+		return "Passwords don't match.";
+	console.log("users");
+
+	console.log(users);
+
+	for (var i = 0; i < users.length; i++) {
+		if (arr[8] == users[i])
+			return "Username " + arr[8] + " is already taken.";
+		else if (arr[9] == users[i])
+			return "Email " + arr[9] + " is already registerd.";
 	};
 
-	function adduser(arr) {
+	return "valid";
+}
 
-		users = users.concat({
-			id : users.length,
-			fname : arr[0],
-			lname : arr[1],
-			address : arr[2],
-			city : arr[3],
-			state : arr[4],
-			country : arr[5],
-			zipcode : arr[6],
-			phone : arr[7],
-			username : arr[8],
-			email : arr[9],
-			password : arr[10],
-			question : arr[11],
-			answer : arr[12]
-		});
+// Server starts running when listen is called.
+app.listen(process.env.PORT || 3412);
+console.log("server listening port:3412");
 
-		return users[users.length - 1];
-	};
-
-	function isValid(arr, renter) {
-
-		for (var i = 0; i < arr.length; i++) {
-			console.log(i);
-			console.log(arr);
-			if (arr[i].length == 0)
-				return "Form is not complete.";
-		};
-		console.log("validating");
-
-		if (arr[10] != renter)
-			return "Passwords don't match.";
-		console.log("users");
-
-		console.log(users);
-
-		for (var i = 0; i < users.length; i++) {
-			if (arr[8] == users[i])
-				return "Username " + arr[8] + " is already taken.";
-			else if (arr[9] == users[i])
-				return "Email " + arr[9] + " is already registerd.";
-		};
-
-		return "valid";
-	}
-
-	// Server starts running when listen is called.
-	app.listen(process.env.PORT || 3412);
-	console.log("server listening port:3412");
-
-}); 
