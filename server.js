@@ -484,7 +484,7 @@ client.connect(function(err) {
 		}
 
 		var newAddress = new Address(req.body.name, req.body.street, req.body.city, req.body.state, req.body.zip, req.body.country, req.body.phone);
-		console.log("New Address: " + JSON.stringify(newAddress));
+		console.log("ANew Address: " + JSON.stringify(newAddress));
 		newAddress.id = addressNextId++;
 		addressList.push(newAddress);
 		res.json(true);
@@ -500,13 +500,13 @@ client.connect(function(err) {
 		}
 
 		var newCreditCard = new CreditCard(req.body.cardnumber, req.body.exp_month, req.body.exp_year, req.body.holder_name);
-		console.log("New Address: " + JSON.stringify(newCreditCard));
+		console.log("CNew Address: " + JSON.stringify(newCreditCard));
 		newCreditCard.id = creditcardNextId++;
 		creditcardList.push(newCreditCard);
 		res.json(true);
 	});
 
-<<<<<<< HEAD
+
 	//Login
 	app.post('/BigBoxServer/user', function(req, res) {
 		// if the username is not submitted, give it a default of "Anonymous"
@@ -522,6 +522,7 @@ client.connect(function(err) {
 			console.log("QWERTY " + JSON.stringify(result.rows));
 			if(JSON.stringify(result.rows) == "[]"){
 				res.send(404, "Please Login.");
+				
 			}
 			else{
 			var response = {
@@ -542,14 +543,9 @@ client.connect(function(err) {
 
 			res.send(401, "Incorect username or password.");
 		}*/
-	});
-=======
-	var newCreditCard = new CreditCard(req.body.cardnumber, req.body.exp_month, req.body.exp_year, req.body.holder_name);
-	console.log("New Address: " + JSON.stringify(newCreditCard));
-	newCreditCard.id = creditcardNextId++;
-	creditcardList.push(newCreditCard);
-	res.json(true);
+	
 });
+	
 
 //Login
 app.post('/BigBoxServer/user', function(req, res) {
@@ -557,7 +553,7 @@ app.post('/BigBoxServer/user', function(req, res) {
 
 	user = findByUsername(req.body.username);
 	// store the username as a session variable
->>>>>>> 8e0ee5d6d361a7b3a967b91e562fc5bdba384bbb
+
 
 	if (req.body.username == user.username && req.body.password == user.password) {
 		req.session.username = req.body.username;
@@ -787,7 +783,6 @@ function isValid(arr, renter) {
 app.listen(process.env.PORT || 3412);
 console.log("server listening port:3412");
 
-<<<<<<< HEAD
+
 });
-=======
->>>>>>> 8e0ee5d6d361a7b3a967b91e562fc5bdba384bbb
+
