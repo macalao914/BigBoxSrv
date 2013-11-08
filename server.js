@@ -141,7 +141,9 @@ client.connect(function(err) {
 	/*  Variables to store the data in the server  */
 
 	//defines the item list
-	var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", false, "", "Pepe Mengano", "4.00"), new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
+	var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), 
+	new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", true, "", "Pepe Mengano", "4.00"), 
+	new Item("Megaman", "NT", "2003", "Join MegaMan and Battle Network pal, Lan, are in trouble again. It's only been a month since the evil WWW terrorist's attempts to...", true, "5.00", "megaman.png", "125mm", "8mm", "14mm", "2.26oz", "USA", "Puerto Rico", "used", true, "3", "Juanita Canales", "0.00"));
 
 	//defines the category list
 	//Adding root and first level
@@ -325,11 +327,21 @@ client.connect(function(err) {
 
 	//Read all items in the cart
 	app.get('/BigBoxServer/cart', function(req, res) {
-		console.log("GET-CART");
-		var response = {
-			"cart" : cartList
-		};
-		res.json(response);
+		console.log("GET-CART for user 1");
+		
+		client.query("SELECT * FROM (cart_items natural join users natural join cart) as thecarts, items  WHERE thecarts.i_id = items.i_id AND thecarts.u_id = 1 and cart_id%2!=0", function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
+			}
+			console.log(" " + result.rows);
+			var id = req.params.cart_id;
+			console.log("GET cart: " + id);
+
+			var response = {
+				"cart" : result.rows
+			};
+			res.json(response);
+		});
 	});
 
 	//Read all the addresses that a user has saved
