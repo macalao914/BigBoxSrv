@@ -4,7 +4,9 @@ var app = express();
 
 var pg = require('pg');
 var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
+//var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
 var client = new pg.Client(conString);
+var user_id;
 
 client.connect(function(err) {
 	if (err) {
@@ -71,7 +73,7 @@ client.connect(function(err) {
 
 	app.use(express.bodyParser());
 
-	var users = [{
+/*	var users = [{
 		id : 1,
 		fname : 'Frasisco',
 		lname : 'Dechoudens',
@@ -122,6 +124,7 @@ client.connect(function(err) {
 		}],
 		isAdmin : false
 	}];
+	*/
 
 	var cookie = new Array();
 
@@ -256,7 +259,6 @@ client.connect(function(err) {
 
 		});
 	});
-	
 
 	/**
 	 client.connect(function(err) {
@@ -319,17 +321,24 @@ client.connect(function(err) {
 
 	app.get('/BigBoxServer/items', function(req, res) {
 		console.log("GET-itemS");
-		var response = {
-			"items" : itemList
-		};
-		res.json(response);
+
+		client.query("select * from items", function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
+			}
+			console.log(" " + JSON.stringify(result.rows[0]));
+			var response = {
+				"items" : result.rows
+			};
+			res.json(response);
+		});
 	});
 
 	//Read all items in the cart
 	app.get('/BigBoxServer/cart', function(req, res) {
 		console.log("GET-CART for user 1");
 		
-		client.query("SELECT * FROM (cart_items natural join users natural join cart) as thecarts, items  WHERE thecarts.i_id = items.i_id AND thecarts.u_id = 1 and cart_id%2!=0", function(err, result) {
+		client.query("SELECT * FROM (cart_items natural join users natural join cart) as thecarts, items  WHERE thecarts.i_id = items.i_id AND thecarts.u_id =" + user_id + "and cart_id%2!=0", function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
@@ -366,29 +375,17 @@ client.connect(function(err) {
 	app.get('/BigBoxServer/items/:id', function(req, res) {
 		var id = req.params.id;
 		console.log("GET item: " + id);
-
-		if ((id < 0) || (id >= itemNextId)) {
-			// not found
-			res.statusCode = 404;
-			res.send("Item not found.");
-		} else {
-			var target = -1;
-			for (var i = 0; i < itemList.length; ++i) {
-				if (itemList[i].id == id) {
-					target = i;
-					break;
-				}
+		
+		client.query("select * from items where i_id = "+id, function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
 			}
-			if (target == -1) {
-				res.statusCode = 404;
-				res.send("Item not found.");
-			} else {
-				var response = {
-					"item" : itemList[target]
-				};
-				res.json(response);
-			}
-		}
+			console.log(" " + JSON.stringify(result.rows));
+			var response = {
+				"items" : result.rows
+			};
+			res.json(response);
+		});
 	});
 
 	//Read an address based on its id
@@ -451,8 +448,12 @@ client.connect(function(err) {
 
 	//Verify if user a user is logged
 	app.get('/BigBoxServer/verify/', function(req, res) {
-
+			
+			
+			res.send(200);
+			
 		// if user is not logged in, ask them to login
+		/*
 		console.log(cookie[0]);
 		if (cookie[0] != undefined) {
 			console.log("made it");
@@ -465,7 +466,7 @@ client.connect(function(err) {
 			}
 		} else
 			res.send(200);
-		//catch bug when reloading site after user is logged in
+		//catch bug when reloading site after user is logged in*/
 	});
 
 	//User logout, back to home page
@@ -521,14 +522,36 @@ client.connect(function(err) {
 	});
 
 
+	//Login
 
-//Login
 	app.post('/BigBoxServer/user', function(req, res) {
-	// if the username is not submitted, give it a default of "Anonymous"
-
-		user = findByUsername(req.body.username);
-	// store the username as a session variable
-
+		// if the username is not submitted, give it a default of "Anonymous"
+		//user = findByUsername(req.body.username);
+		// store the username as a session variable
+		
+		console.log("HERE"+JSON.stringify(req.body.username));
+		
+		client.query("select * from users where u_username = '"+ req.body.username +"' and u_password = '"+req.body.password+"'", function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
+			}
+			user_id = result.rows[0].u_id;
+			console.log("QWERTY " + JSON.stringify(result.rows));
+			if(JSON.stringify(result.rows) == "[]"){
+				res.send(404, "Please Login.");
+				
+			}
+			else{
+			var response = {
+				"user" : result.rows
+			};
+			res.json(response);	}
+			
+		});
+		
+		
+		
+/*
 		if (req.body.username == user.username && req.body.password == user.password) {
 			req.session.username = req.body.username;
 			cookie.push(req.session);
@@ -536,8 +559,28 @@ client.connect(function(err) {
 		} else {
 
 			res.send(401, "Incorect username or password.");
-		}
-	});
+		}*/
+	
+});
+	
+
+//Login
+app.post('/BigBoxServer/user', function(req, res) {
+	// if the username is not submitted, give it a default of "Anonymous"
+
+	user = findByUsername(req.body.username);
+	// store the username as a session variable
+
+
+	if (req.body.username == user.username && req.body.password == user.password) {
+		req.session.username = req.body.username;
+		cookie.push(req.session);
+		res.send(200);
+	} else {
+
+		res.send(401, "Incorect username or password.");
+	}
+});
 
 //Login
 app.post('/BigBoxServer/user', function(req, res) {
@@ -726,7 +769,7 @@ function adduser(arr) {
 	});
 
 	return users[users.length - 1];
-};
+}
 
 function isValid(arr, renter) {
 
@@ -749,10 +792,10 @@ function isValid(arr, renter) {
 			return "Username " + arr[8] + " is already taken.";
 		else if (arr[9] == users[i])
 			return "Email " + arr[9] + " is already registerd.";
-	}
+	};
 
 	return "valid";
-}
+};
 
 
 
@@ -761,3 +804,6 @@ app.listen(process.env.PORT || 3412);
 console.log("server listening port:3412");
 
 });
+
+
+
