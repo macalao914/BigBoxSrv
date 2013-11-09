@@ -3,8 +3,8 @@ var express = require('express'), http = require('http'), path = require('path')
 var app = express();
 
 var pg = require('pg');
-var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
-//var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
+//var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
+var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
 var client = new pg.Client(conString);
 var user_id;
 
@@ -208,7 +208,7 @@ client.connect(function(err) {
 	 ====================================================================================================================================*/
 
 	app.get('/BigBoxServer/categories', function(req, res) {
-		client.query("SELECT * from category", function(err, result) {
+		client.query("select  cid,cname,count(subid) from category natural full join subcategory group by cid, cname", function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
@@ -225,7 +225,7 @@ client.connect(function(err) {
 	app.get('/BigBoxServer/subcategories/:id', function(req, res) {
 		var id = req.params.id;
 		console.log("id send:" + id);
-		client.query("SELECT * from category natural join subcategory where cid = " + id, function(err, result) {
+		client.query("select  subid,scname,count(ssubid) from subcategory natural full join secondsubcategory group by subid, scname ,cid having cid = " + id, function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
@@ -236,6 +236,7 @@ client.connect(function(err) {
 			var response = {
 				"categories" : result.rows
 			};
+			console.log("reponse:" + JSON.stringify(response));
 			res.json(response);
 
 		});
@@ -529,19 +530,23 @@ client.connect(function(err) {
 		//user = findByUsername(req.body.username);
 		// store the username as a session variable
 		
-		console.log("HERE"+JSON.stringify(req.body.username));
+		console.log("USERNAME"+JSON.stringify(req.body.username));
+		console.log("PWD"+JSON.stringify(req.body.password));
 		
-		client.query("select * from users where u_username = '"+ req.body.username +"' and u_password = '"+req.body.password+"'", function(err, result) {
+		client.query("select * from users where u_fname = '"+ req.body.username +"' and u_password = '"+req.body.password+"'", function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
-			user_id = result.rows[0].u_id;
 			console.log("QWERTY " + JSON.stringify(result.rows));
+			console.log("QWERTY_2 " + result.rows);
+			
+			
 			if(JSON.stringify(result.rows) == "[]"){
 				res.send(404, "Please Login.");
 				
 			}
 			else{
+			user_id = result.rows[0].u_id;
 			var response = {
 				"user" : result.rows
 			};
