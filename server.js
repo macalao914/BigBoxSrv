@@ -143,6 +143,8 @@ client.connect(function(err) {
 	var CartItem = cartItem.CartItem;
 	/*  Variables to store the data in the server  */
 
+	//not necessary anymore
+	/*
 	//defines the item list
 	var itemList = new Array(new Item("Star Wars", "Episode 1", "1999", "Two Jedi Knights escape a hostile blokade...", true, "22.00", "starwars.png", "19mm", "135mm", "14mm", "2.26oz", "Worldwide", "Puerto Rico", "new", true, "3", "Pepe Fulano", "3.00"), 
 	new Item("iPhone charger", "", "", "5V charger, is not too good but it's cheap", true, "2.00", "charger.png", "10mm", "5mm", "5mm", "2oz", "Worldwide", "Puerto Rico", "new", true, "", "Pepe Mengano", "4.00"), 
@@ -178,6 +180,7 @@ client.connect(function(err) {
 	for (var i = 0; i < itemList.length; ++i) {
 		itemList[i].id = itemNextId++;
 	}
+	*/
 
 	//defines the items in the cart
 	var cartList = new Array();
