@@ -3,8 +3,8 @@ var express = require('express'), http = require('http'), path = require('path')
 var app = express();
 
 var pg = require('pg');
-var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
-//var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
+//var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
+var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
 var client = new pg.Client(conString);
 var user_id;
 
@@ -323,10 +323,19 @@ client.connect(function(err) {
 	 });
 	 */
 
-	app.get('/BigBoxServer/items', function(req, res) {
+	app.get('/BigBoxServer/itemsearch/:searchValue', function(req, res) {
+		var searchValue = req.params.searchValue;
+		console.log("searchValue: "+ searchValue.slice(1,searchValue.length));
+		
+		//Use to improve search (Case Insensitive and Space Insensitive)
+		var Upper = "";
+		Upper = Upper.concat(searchValue.toUpperCase());
+		Upper = Upper.replace(/ /g,"%");
+		console.log("upper:"+Upper);
+	
 		console.log("GET-itemS");
 
-		client.query("select * from items", function(err, result) {
+		client.query("select * from items where upper(replace(i_name, ' ', '')) like '%"+Upper+"%'", function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
