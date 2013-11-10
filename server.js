@@ -3,8 +3,8 @@ var express = require('express'), http = require('http'), path = require('path')
 var app = express();
 
 var pg = require('pg');
-//var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
-var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
+var conString = "postgres://postgres:macalao914@localhost:5432/BigBoxDB";
+//var conString = "postgres://postgres:Julia2169@:5432@localhost/BigBoxDB";
 var client = new pg.Client(conString);
 var user_id;
 
@@ -340,7 +340,7 @@ client.connect(function(err) {
 
 	//Read all items in the cart
 	app.get('/BigBoxServer/cart', function(req, res) {
-		console.log("GET-CART for user 1");
+		console.log("GET-CART for user" + user_id);
 		
 		client.query("SELECT * FROM (cart_items natural join users natural join cart) as thecarts, items  WHERE thecarts.i_id = items.i_id AND thecarts.u_id =" + user_id + "and cart_id%2!=0", function(err, result) {
 			if (err) {
@@ -573,7 +573,7 @@ client.connect(function(err) {
 		console.log("USERNAME"+JSON.stringify(req.body.username));
 		console.log("PWD"+JSON.stringify(req.body.password));
 		
-		client.query("select * from users where u_fname = '"+ req.body.username +"' and u_password = '"+req.body.password+"'", function(err, result) {
+		client.query("select * from users where u_username = '"+ req.body.username +"' and u_password = '"+req.body.password+"'", function(err, result) {
 			if (err) {
 				return console.error('error running query', err);
 			}
