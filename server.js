@@ -343,8 +343,6 @@ client.connect(function(err) {
 				return console.error('error running query', err);
 			}
 			console.log(" " + result.rows);
-			var id = req.params.cart_id;
-			console.log("GET cart: " + id);
 
 			var response = {
 				"cart" : result.rows
@@ -355,20 +353,35 @@ client.connect(function(err) {
 
 	//Read all the addresses that a user has saved
 	app.get('/BigBoxServer/addresses', function(req, res) {
-		console.log("GET-ADDRESSES");
+		console.log("GET-ADDRESSES for user" + user_id);
+
+		client.query("SELECT * FROM users natural join addresses natural join user_addresses  WHERE u_id =" + user_id , function(err, result) {
+		if (err) {
+			return console.error('error running query', err);
+		}
+		console.log(" " + result.rows);
+
 		var response = {
-			"addresses" : addressList
+			"addresses" : result.rows
 		};
 		res.json(response);
+	});
 	});
 
 	//Read all the credit card that a user has saved
 	app.get('/BigBoxServer/creditcards', function(req, res) {
-		console.log("GET CREDIT CARDS");
+		console.log("GET CREDIT CARDS for user" + user_id);
+		client.query("SELECT * FROM users natural join user_creditcards natural join creditcards  WHERE u_id =" + user_id , function(err, result) {
+		if (err) {
+			return console.error('error running query', err);
+		}
+		console.log(" " + result.rows);
+
 		var response = {
-			"creditcards" : creditcardList
+			"creditcards" : result.rows
 		};
 		res.json(response);
+	});
 	});
 
 	//Read a car based on its id
@@ -392,8 +405,18 @@ client.connect(function(err) {
 	app.get('/BigBoxServer/addresses/:id', function(req, res) {
 		var id = req.params.id;
 		console.log("GET address: " + id);
+		client.query("select * from addresses where a_id = "+id, function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
+			}
+			console.log(" " + JSON.stringify(result.rows));
+			var response = {
+				"address" : result.rows
+			};
+			res.json(response);
+		});
 
-		if ((id < 0) || (id >= addressNextId)) {
+		/*if ((id < 0) || (id >= addressNextId)) {
 			// not found
 			res.statusCode = 404;
 			res.send("Address not found.");
@@ -415,14 +438,27 @@ client.connect(function(err) {
 				res.json(response);
 			}
 		}
+		*/
+		
 	});
 
 	//Read a credit card based on its id
 	app.get('/BigBoxServer/creditcards/:id', function(req, res) {
-		var id = req.params.id;
+		console.log(req.params);
+	    var id = req.params.id;
 		console.log("GET credit card " + id);
 
-		if ((id < 0) || (id >= creditcardNextId)) {
+		client.query("select * from creditcards where cc_number = " + id, function(err, result) {
+			if (err) {
+				return console.error('error running query', err);
+			}
+			console.log(" " + JSON.stringify(result.rows));
+			var response = {
+				"creditcard" : result.rows
+			};
+			res.json(response);
+		});
+		/*if ((id < 0) || (id >= creditcardNextId)) {
 			// not found
 			res.statusCode = 404;
 			res.send("Credit Card not found.");
@@ -444,6 +480,7 @@ client.connect(function(err) {
 				res.json(response);
 			}
 		}
+		*/
 	});
 
 	//Verify if user a user is logged
